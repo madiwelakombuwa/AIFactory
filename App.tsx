@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import PhaseView from './components/PhaseView';
 import AITools from './components/AITools';
+import Resources from './components/Resources';
 import { AppTab } from './types';
 import { Menu } from 'lucide-react';
 
@@ -44,6 +45,8 @@ const App: React.FC = () => {
         return <PhaseView completedActivities={completedActivities} toggleActivity={toggleActivity} />;
       case AppTab.AI_TOOLS:
         return <AITools />;
+      case AppTab.RESOURCES:
+        return <Resources />;
       default:
         return <Dashboard completedActivities={completedActivities} />;
     }
