@@ -60,12 +60,12 @@ const Dashboard: React.FC<DashboardProps> = ({ completedActivities }) => {
 
   // Mission progress trend data (simulated monthly data)
   const monthlyData = [
-    { month: 'Jan', completed: Math.floor(currentCompleted * 0.25), failed: 3 },
-    { month: 'Feb', completed: Math.floor(currentCompleted * 0.42), failed: 5 },
-    { month: 'Mar', completed: Math.floor(currentCompleted * 0.58), failed: 4 },
-    { month: 'Apr', completed: Math.floor(currentCompleted * 0.71), failed: 6 },
-    { month: 'May', completed: Math.floor(currentCompleted * 0.88), failed: 4 },
-    { month: 'Jun', completed: currentCompleted, failed: 8 },
+    { month: 'Jan', completed: Math.floor(currentCompleted * 0.25), pipeline: 3 },
+    { month: 'Feb', completed: Math.floor(currentCompleted * 0.42), pipeline: 5 },
+    { month: 'Mar', completed: Math.floor(currentCompleted * 0.58), pipeline: 4 },
+    { month: 'Apr', completed: Math.floor(currentCompleted * 0.71), pipeline: 6 },
+    { month: 'May', completed: Math.floor(currentCompleted * 0.88), pipeline: 4 },
+    { month: 'Jun', completed: currentCompleted, pipeline: remainingActivities > 8 ? 8 : remainingActivities },
   ];
 
   return (
@@ -249,16 +249,16 @@ const Dashboard: React.FC<DashboardProps> = ({ completedActivities }) => {
                   <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3}/>
                   <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
                 </linearGradient>
-                <linearGradient id="colorFailed" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                <linearGradient id="colorPipeline" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
               <XAxis dataKey="month" stroke="#64748b" style={{ fontSize: '12px' }} />
               <YAxis stroke="#64748b" style={{ fontSize: '12px' }} />
               <Area type="monotone" dataKey="completed" stroke="#14b8a6" fillOpacity={1} fill="url(#colorCompleted)" strokeWidth={2} />
-              <Area type="monotone" dataKey="failed" stroke="#ef4444" fillOpacity={1} fill="url(#colorFailed)" strokeWidth={2} />
+              <Area type="monotone" dataKey="pipeline" stroke="#f59e0b" fillOpacity={1} fill="url(#colorPipeline)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
           <div className="flex items-center justify-center space-x-6 mt-4">
@@ -267,8 +267,8 @@ const Dashboard: React.FC<DashboardProps> = ({ completedActivities }) => {
               <span className="text-xs text-slate-400">Completed Ops</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-xs text-slate-400">Failed Ops</span>
+              <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+              <span className="text-xs text-slate-400">Ops in Pipeline</span>
             </div>
           </div>
         </div>
