@@ -57,6 +57,16 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isMobileOpen
             </button>
           ))}
         </nav>
+
+        {/* Profile Image at Bottom */}
+        <div className="p-4 border-t border-slate-200">
+          <img
+            src="/images/TL.jpg"
+            alt="Profile"
+            className="w-full rounded-lg shadow-md object-cover"
+            style={{ aspectRatio: '1/1' }}
+          />
+        </div>
       </div>
     </>
   );
