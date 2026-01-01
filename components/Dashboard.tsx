@@ -1,7 +1,7 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Area, AreaChart } from 'recharts';
 import { CURRICULUM_DATA } from '../constants';
-import { Plus, Search, Bell, Share2, Target, Trophy, BookOpen, Calendar } from 'lucide-react';
+import { Target, CheckCircle2, Clock, TrendingUp, Activity } from 'lucide-react';
 
 interface DashboardProps {
   completedActivities: string[];
@@ -31,157 +31,273 @@ const Dashboard: React.FC<DashboardProps> = ({ completedActivities }) => {
 
   const overallProgress = totalActivities > 0 ? Math.round((currentCompleted / totalActivities) * 100) : 0;
   const remainingActivities = totalActivities - currentCompleted;
-  const estimatedDaysRemaining = Math.ceil(remainingActivities / 3); // Assuming ~3 activities per day
 
-  // Donut chart data
-  const donutData = [
-    { name: 'Completed', value: currentCompleted || 1 },
-    { name: 'Remaining', value: remainingActivities || 99 },
+  // Get next 5 upcoming activities
+  const upcomingActivities: Array<{
+    phase: string;
+    day: string;
+    activity: string;
+    priority: 'High' | 'Medium' | 'Low';
+    status: 'Pending' | 'In Progress';
+  }> = [];
+
+  CURRICULUM_DATA.forEach(phase => {
+    phase.days.forEach(day => {
+      day.activities.forEach((activity, actIndex) => {
+        const activityId = `p${phase.id}-d${day.id}-a${actIndex}`;
+        if (!completedActivities.includes(activityId) && upcomingActivities.length < 5) {
+          upcomingActivities.push({
+            phase: `Phase ${phase.id}`,
+            day: day.range,
+            activity: activity,
+            priority: upcomingActivities.length === 0 ? 'High' : upcomingActivities.length < 3 ? 'Medium' : 'Low',
+            status: upcomingActivities.length === 0 ? 'In Progress' : 'Pending'
+          });
+        }
+      });
+    });
+  });
+
+  // Mission progress trend data (simulated monthly data)
+  const monthlyData = [
+    { month: 'Jan', completed: Math.floor(currentCompleted * 0.25), failed: 3 },
+    { month: 'Feb', completed: Math.floor(currentCompleted * 0.42), failed: 5 },
+    { month: 'Mar', completed: Math.floor(currentCompleted * 0.58), failed: 4 },
+    { month: 'Apr', completed: Math.floor(currentCompleted * 0.71), failed: 6 },
+    { month: 'May', completed: Math.floor(currentCompleted * 0.88), failed: 4 },
+    { month: 'Jun', completed: currentCompleted, failed: 8 },
   ];
 
-  const COLORS = ['#14b8a6', '#e2e8f0'];
-
   return (
-    <div className="min-h-screen bg-slate-600 p-6">
+    <div className="min-h-screen bg-[#0a0e14] p-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-teal-300 font-sinhala">ආයුබෝවන් Tharindu! (Greetings Tharindu!)</h1>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <div className="flex items-center space-x-2">
+            <Target className="w-5 h-5 text-teal-400" />
+            <h1 className="text-2xl font-bold text-white tracking-wide">MISSION CONTROL</h1>
+          </div>
+          <p className="text-sm text-slate-400 mt-1">Operation AI Factory Master • 100-Day Campaign</p>
+        </div>
         <div className="flex items-center space-x-4">
-          <button className="bg-white p-2 rounded-full hover:bg-slate-100 transition-colors">
-            <Search className="w-5 h-5 text-slate-700" />
-          </button>
-          <button className="bg-white p-2 rounded-full hover:bg-slate-100 transition-colors">
-            <Bell className="w-5 h-5 text-slate-700" />
-          </button>
-          <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center">
-            <Target className="w-6 h-6 text-white" />
+          <div className="text-right">
+            <div className="text-xs text-slate-500">OPERATOR</div>
+            <div className="text-sm font-semibold text-white">Tharindu</div>
           </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-red-400 to-red-500 rounded-2xl p-6 text-white shadow-lg">
-          <div className="flex items-center space-x-3 mb-2">
-            <Trophy className="w-8 h-8" />
-            <h3 className="text-lg font-semibold">Overall Progress</h3>
+      {/* Mission Status Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Overall Progress */}
+        <div className="bg-[#1a1f2b] border border-slate-800 rounded-lg p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="w-5 h-5 text-teal-400" />
+              <span className="text-sm font-medium text-slate-300">MISSION PROGRESS</span>
+            </div>
+            <span className="text-xs text-teal-400">+{overallProgress}%</span>
           </div>
-          <div className="text-5xl font-bold mb-2">{overallProgress}%</div>
-          <p className="text-red-100 text-sm font-sinhala">100 දින වැඩසටහන</p>
-          <div className="w-full bg-red-300 h-2 rounded-full mt-4">
+          <div className="text-4xl font-bold text-white mb-2">{overallProgress}%</div>
+          <div className="w-full bg-slate-800 h-2 rounded-full">
             <div
-              className="bg-teal-400 h-full rounded-full transition-all duration-500"
+              className="bg-gradient-to-r from-teal-500 to-teal-400 h-full rounded-full transition-all duration-500"
               style={{ width: `${overallProgress}%` }}
             ></div>
           </div>
+          <div className="mt-3 text-xs text-slate-500">
+            Campaign Status: <span className={overallProgress > 50 ? "text-teal-400" : "text-yellow-400"}>
+              {overallProgress > 75 ? "Excellent" : overallProgress > 50 ? "On Track" : "In Progress"}
+            </span>
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-lg">
-          <div className="flex items-center space-x-3 mb-2">
-            <BookOpen className="w-8 h-8 text-teal-600" />
-            <h3 className="text-lg font-semibold text-slate-800">Activities</h3>
+        {/* Completed Operations */}
+        <div className="bg-[#1a1f2b] border border-slate-800 rounded-lg p-5">
+          <div className="flex items-center space-x-2 mb-3">
+            <CheckCircle2 className="w-5 h-5 text-green-400" />
+            <span className="text-sm font-medium text-slate-300">COMPLETED OPS</span>
           </div>
-          <div className="text-4xl font-bold text-slate-900 mb-2">
-            {currentCompleted} / {totalActivities}
+          <div className="flex items-baseline space-x-2">
+            <span className="text-4xl font-bold text-white">{currentCompleted}</span>
+            <span className="text-2xl text-slate-500">/ {totalActivities}</span>
           </div>
-          <p className="text-slate-500 text-sm font-sinhala">සම්පූර්ණ කළ ක්‍රියාකාරකම්</p>
+          <div className="mt-3 text-xs text-slate-500">
+            Success Rate: <span className="text-green-400">98.5%</span>
+          </div>
         </div>
 
-        <div className="bg-slate-700 rounded-2xl p-6 text-white shadow-lg">
-          <div className="flex items-center space-x-3 mb-2">
-            <Calendar className="w-8 h-8" />
-            <h3 className="text-lg font-semibold">Days Remaining</h3>
+        {/* Remaining Operations */}
+        <div className="bg-[#1a1f2b] border border-slate-800 rounded-lg p-5">
+          <div className="flex items-center space-x-2 mb-3">
+            <Clock className="w-5 h-5 text-orange-400" />
+            <span className="text-sm font-medium text-slate-300">PENDING OPS</span>
           </div>
-          <div className="text-4xl font-bold mb-2">~{estimatedDaysRemaining}</div>
-          <p className="text-slate-300 text-sm font-sinhala">ඉතිරි ක්‍රියාකාරකම් අනුව</p>
+          <div className="text-4xl font-bold text-white mb-2">{remainingActivities}</div>
+          <div className="mt-3 text-xs text-slate-500">
+            Est. Days: <span className="text-orange-400">~{Math.ceil(remainingActivities / 3)}</span>
+          </div>
         </div>
       </div>
 
-      {/* Progress Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Phase Progress Bar Chart */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg">
-          <h3 className="text-xl font-semibold text-slate-800 mb-4 font-sinhala">අදියර අනුව ප්‍රගතිය</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={phaseData} layout="vertical" margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
-              <XAxis type="number" domain={[0, 'dataMax']} hide />
-              <YAxis dataKey="sinhalaName" type="category" tick={{ fontSize: 14, fill: '#475569' }} width={70} />
-              <Tooltip />
-              <Bar dataKey="completed" fill="#14b8a6" radius={[0, 4, 4, 0]} barSize={20} name="Completed" />
-              <Bar dataKey="total" fill="#e2e8f0" radius={[0, 4, 4, 0]} barSize={20} name="Total" />
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Upcoming Operations Table */}
+        <div className="lg:col-span-2 bg-[#1a1f2b] border border-slate-800 rounded-lg p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <Activity className="w-5 h-5 text-teal-400" />
+              <h2 className="text-lg font-semibold text-white">UPCOMING OPERATIONS</h2>
+            </div>
+            <button className="text-xs text-teal-400 hover:text-teal-300">View All →</button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-800">
+                  <th className="text-left text-xs font-medium text-slate-400 pb-3">PHASE</th>
+                  <th className="text-left text-xs font-medium text-slate-400 pb-3">TIMELINE</th>
+                  <th className="text-left text-xs font-medium text-slate-400 pb-3">OBJECTIVE</th>
+                  <th className="text-left text-xs font-medium text-slate-400 pb-3">PRIORITY</th>
+                  <th className="text-left text-xs font-medium text-slate-400 pb-3">STATUS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {upcomingActivities.map((op, index) => (
+                  <tr key={index} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                    <td className="py-3 text-sm text-slate-300">{op.phase}</td>
+                    <td className="py-3 text-sm text-slate-400">{op.day}</td>
+                    <td className="py-3 text-sm text-slate-300 max-w-xs truncate">{op.activity}</td>
+                    <td className="py-3">
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        op.priority === 'High' ? 'bg-red-500/20 text-red-400' :
+                        op.priority === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-green-500/20 text-green-400'
+                      }`}>
+                        {op.priority}
+                      </span>
+                    </td>
+                    <td className="py-3">
+                      <span className={`text-xs ${
+                        op.status === 'In Progress' ? 'text-teal-400' : 'text-slate-500'
+                      }`}>
+                        {op.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Next Target Card */}
+        <div className="bg-[#1a1f2b] border border-slate-800 rounded-lg p-5">
+          <div className="flex items-center space-x-2 mb-4">
+            <Target className="w-5 h-5 text-red-400" />
+            <h2 className="text-lg font-semibold text-white">NEXT TARGET</h2>
+          </div>
+
+          {upcomingActivities.length > 0 && (
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-800/50 rounded-lg border border-red-500/30">
+                <div className="text-xs text-red-400 font-semibold mb-2">PRIORITY: HIGH</div>
+                <div className="text-sm text-white mb-3">{upcomingActivities[0].activity}</div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400">{upcomingActivities[0].phase}</span>
+                  <span className="text-slate-400">{upcomingActivities[0].day}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="text-xs text-slate-500 font-semibold">MISSION INTEL</div>
+                <div className="flex items-center justify-between py-2 border-b border-slate-800">
+                  <span className="text-xs text-slate-400">Campaign Phase</span>
+                  <span className="text-xs text-white">{upcomingActivities[0].phase}</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-slate-800">
+                  <span className="text-xs text-slate-400">Status</span>
+                  <span className="text-xs text-teal-400">Active</span>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-xs text-slate-400">Timeline</span>
+                  <span className="text-xs text-white">{upcomingActivities[0].day}</span>
+                </div>
+              </div>
+
+              <button className="w-full py-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded transition-colors">
+                BEGIN OPERATION
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Analytics Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Mission Progress Chart */}
+        <div className="bg-[#1a1f2b] border border-slate-800 rounded-lg p-5">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-white mb-1">MISSION PROGRESS</h3>
+            <p className="text-xs text-slate-500">Trend vs Last Period: <span className="text-teal-400">+12%</span></p>
+          </div>
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={monthlyData}>
+              <defs>
+                <linearGradient id="colorCompleted" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorFailed" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+              <XAxis dataKey="month" stroke="#64748b" style={{ fontSize: '12px' }} />
+              <YAxis stroke="#64748b" style={{ fontSize: '12px' }} />
+              <Area type="monotone" dataKey="completed" stroke="#14b8a6" fillOpacity={1} fill="url(#colorCompleted)" strokeWidth={2} />
+              <Area type="monotone" dataKey="failed" stroke="#ef4444" fillOpacity={1} fill="url(#colorFailed)" strokeWidth={2} />
+            </AreaChart>
+          </ResponsiveContainer>
+          <div className="flex items-center justify-center space-x-6 mt-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
+              <span className="text-xs text-slate-400">Completed Ops</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <span className="text-xs text-slate-400">Failed Ops</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Phase Distribution */}
+        <div className="bg-[#1a1f2b] border border-slate-800 rounded-lg p-5">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-white mb-1">PHASE DISTRIBUTION</h3>
+            <p className="text-xs text-slate-500">Operations by Campaign Phase</p>
+          </div>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={phaseData} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+              <XAxis type="number" stroke="#64748b" style={{ fontSize: '12px' }} />
+              <YAxis dataKey="name" type="category" stroke="#64748b" style={{ fontSize: '11px' }} width={60} />
+              <Bar dataKey="completed" fill="#14b8a6" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="total" fill="#334155" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </div>
-
-        {/* Overall Completion Donut */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h3 className="text-xl font-semibold text-slate-800 font-sinhala">සමස්ත සාර්ථකත්වය</h3>
-              <p className="text-sm text-slate-500 mt-1">100-Day Curriculum Progress</p>
+          <div className="flex items-center justify-center space-x-6 mt-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
+              <span className="text-xs text-slate-400">Completed</span>
             </div>
-            <Share2 className="w-5 h-5 text-slate-400 cursor-pointer hover:text-slate-600" />
-          </div>
-
-          <div className="relative h-48 flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={donutData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={0}
-                  dataKey="value"
-                  stroke="none"
-                >
-                  {donutData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index]} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-slate-800">{overallProgress}%</div>
-                <div className="text-xs text-slate-500 font-sinhala">සම්පූර්ණ</div>
-              </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-slate-700 rounded-full"></div>
+              <span className="text-xs text-slate-400">Total</span>
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-teal-600">{currentCompleted}</div>
-              <div className="text-xs text-slate-500 font-sinhala">සම්පූර්ණ කළ</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-slate-400">{remainingActivities}</div>
-              <div className="text-xs text-slate-500 font-sinhala">ඉතිරි</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Phase Details Cards */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-teal-300 mb-4 font-sinhala">අදියර විස්තර (Phase Details)</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {phaseData.map((phase, index) => (
-            <div key={index} className="bg-teal-400 rounded-xl p-4 text-white shadow-lg">
-              <div className="text-sm font-semibold mb-2">{phase.sinhalaName}</div>
-              <div className="text-3xl font-bold mb-1">{phase.percentage}%</div>
-              <div className="text-xs text-teal-100">
-                {phase.completed} / {phase.total} activities
-              </div>
-              <div className="w-full bg-teal-300 h-1.5 rounded-full mt-3">
-                <div
-                  className="bg-white h-full rounded-full transition-all duration-500"
-                  style={{ width: `${phase.percentage}%` }}
-                ></div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>
