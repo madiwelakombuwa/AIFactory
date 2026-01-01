@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Bot, Calendar, Target } from 'lucide-react';
+import { LayoutDashboard, Bot, Calendar, Target, BookOpen } from 'lucide-react';
 import { AppTab } from '../types';
 
 interface SidebarProps {
@@ -14,6 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isMobileOpen
     { id: AppTab.DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
     { id: AppTab.CURRICULUM, label: '100 Days', icon: Calendar },
     { id: AppTab.AI_TOOLS, label: 'AI Chat', icon: Bot },
+    { id: AppTab.RESOURCES, label: 'Resources', icon: BookOpen },
   ];
 
   return (
@@ -63,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isMobileOpen
           <img
             src="/images/TL.jpg"
             alt="Profile"
-            className="w-full rounded-lg shadow-md object-cover"
+            className="w-1/2 mx-auto rounded-lg shadow-md object-cover"
             style={{ aspectRatio: '1/1' }}
           />
         </div>
