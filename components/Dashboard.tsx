@@ -45,7 +45,7 @@ const Dashboard: React.FC<DashboardProps> = ({ completedActivities }) => {
     <div className="min-h-screen bg-slate-600 p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-teal-300 font-sinhala">ආයුබෝවන්! (Greetings!)</h1>
+        <h1 className="text-3xl font-bold text-teal-300 font-sinhala">ආයුබෝවන් Tharindu! (Greetings Tharindu!)</h1>
         <div className="flex items-center space-x-4">
           <button className="bg-white p-2 rounded-full hover:bg-slate-100 transition-colors">
             <Search className="w-5 h-5 text-slate-700" />
